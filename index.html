@@ -2,52 +2,53 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Galaxy Unpacked 2026</title>
-    <script src="https://telegram.org"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Unpacked 2026 Countdown</title>
     <style>
         :root {
-            --bg-color: var(--tg-theme-bg-color, #000000);
-            --text-color: var(--tg-theme-text-color, #ffffff);
-            --accent-color: var(--tg-theme-button-color, #0689D8);
-            --hint-color: var(--tg-theme-hint-color, #888888);
+            --samsung-blue: #1428A0;
+            --galaxy-dark: #000000;
+            --text-main: #ffffff;
+            --accent-blue: #0689D8;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--galaxy-dark);
+            color: var(--text-main);
             margin: 0;
+            height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow: hidden;
         }
 
-        .container {
-            text-align: center;
-            width: 100%;
-            padding: 20px;
+        /* Задний фон с эффектом сияния */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--samsung-blue);
+            filter: blur(150px);
+            opacity: 0.2;
+            z-index: -1;
         }
 
-        .header-label {
-            font-size: clamp(0.8rem, 3vw, 1rem);
-            letter-spacing: 0.5em;
+        .title {
+            font-size: 1.2rem;
+            letter-spacing: 0.5rem;
             text-transform: uppercase;
             margin-bottom: 2rem;
-            color: var(--hint-color);
+            font-weight: 300;
             opacity: 0.8;
         }
 
         #timer {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            max-width: 600px;
-            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
         }
 
         .time-block {
@@ -56,68 +57,54 @@
             align-items: center;
         }
 
+        /* Анимация появления цифр */
         .digit {
-            font-size: clamp(3rem, 15vw, 7rem);
-            font-weight: 800;
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .label {
-            font-size: clamp(0.6rem, 2vw, 0.8rem);
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: var(--accent-color);
-            margin-top: 15px;
+            font-size: 6rem;
             font-weight: 700;
+            line-height: 1;
+            display: inline-block;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .animate {
-            animation: flip 0.5s cubic-bezier(0.2, 0, 0.2, 1);
+            animation: slideUp 0.6s ease-out;
         }
 
-        @keyframes flip {
-            0% { transform: translateY(10px); opacity: 0; filter: blur(3px); }
-            100% { transform: translateY(0); opacity: 1; filter: blur(0); }
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
 
-        .event-live {
-            font-size: 2rem;
-            letter-spacing: 0.3em;
-            font-weight: 800;
-            color: var(--accent-color);
+        .label {
+            font-size: 0.8rem;
             text-transform: uppercase;
+            letter-spacing: 0.2rem;
+            margin-top: 0.5rem;
+            color: var(--accent-blue);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header-label">Galaxy Unpacked</div>
-        
-        <div id="timer">
-            <div class="time-block">
-                <div id="hours" class="digit">00</div>
-                <div class="label">Hours</div>
-            </div>
-            <div class="time-block">
-                <div id="minutes" class="digit">00</div>
-                <div class="label">Mins</div>
-            </div>
-            <div class="time-block">
-                <div id="seconds" class="digit">00</div>
-                <div class="label">Secs</div>
-            </div>
+    <div class="title">Galaxy Unpacked</div>
+    
+    <div id="timer">
+        <div class="time-block">
+            <div id="hours" class="digit">00</div>
+            <div class="label">Hours</div>
+        </div>
+        <div class="time-block">
+            <div id="minutes" class="digit">00</div>
+            <div class="label">Mins</div>
+        </div>
+        <div class="time-block">
+            <div id="seconds" class="digit">00</div>
+            <div class="label">Secs</div>
         </div>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-
-        // Укажи здесь точное время (ГГГГ-ММ-ДДTHH:MM:SS+Пояс)
-        // Сейчас стоит 21:00 по Москве (UTC+3)
+        // Дата события: 25 февраля 2026, 21:00:00
         const targetDate = new Date("Feb 25, 2026 21:00:00").getTime();
 
         function updateElement(id, value) {
@@ -126,8 +113,9 @@
             
             if (el.innerText !== strValue) {
                 el.innerText = strValue;
+                // Перезапуск анимации
                 el.classList.remove('animate');
-                void el.offsetWidth; 
+                void el.offsetWidth; // Магия для сброса анимации
                 el.classList.add('animate');
             }
         }
@@ -136,23 +124,15 @@
             const now = new Date().getTime();
             const distance = targetDate - now;
 
-            if (distance <= 0) {
+            if (distance < 0) {
                 clearInterval(countdown);
-                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                document.querySelector(".container").innerHTML = 
-                    "<div class='event-live'>EVENT IS LIVE</div>";
+                document.body.innerHTML = "<h1 style='font-size:4rem; letter-spacing:1rem;'>THE FUTURE IS HERE</h1>";
                 return;
             }
 
-            // Рассчитываем время
-            const hours = Math.floor(distance / (1000 * 60 * 60));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            // Виброотклик за 5 секунд до конца
-            if (distance <= 5500 && distance > 500) {
-                if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-            }
 
             updateElement("hours", hours);
             updateElement("minutes", minutes);
@@ -161,8 +141,37 @@
     </script>
 </body>
 </html>
+; 
+                el.classList.add('animate');
+            }
+        }
+
+        const countdown = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                clearInterval(countdown);
                 document.querySelector(".container").innerHTML = 
-                    "<div class='event-live'>EVENT IS LIVE</div>";
+                    "<div class='digit' style='font-size: 2rem'>EVENT STARTED</div>";
+                return;
+            }
+
+            const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((distance % (1000 * 60)) / 1000);
+
+            updateElement("hours", h);
+            updateElement("minutes", m);
+            updateElement("seconds", s);
+        }, 1000);
+
+        // Сообщаем Telegram, что приложение готово
+        tg.ready();
+    </script>
+</body>
+</html>
+ent-live'>EVENT IS LIVE</div>";
                 return;
             }
 
