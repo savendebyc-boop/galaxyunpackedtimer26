@@ -2,63 +2,55 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galaxy Unpacked 2026 Countdown</title>
+    <title>Countdown to 21:00</title>
     <style>
-        :root {
-            --samsung-blue: #1428A0;
-            --galaxy-dark: #000000;
-            --text-main: #ffffff;
-            --accent-blue: #0689D8;
-        }
-
         body {
-            background-color: var(--galaxy-dark);
-            color: var(--text-main);
-            margin: 0;
-            height: 100vh;
+            background: #0d1117;
+            color: #58a6ff;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
         }
-
-        /* Задний фон с эффектом сияния */
-        body::before {
-            content: '';
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: var(--samsung-blue);
-            filter: blur(150px);
-            opacity: 0.2;
-            z-index: -1;
-        }
-
-        .title {
-            font-size: 1.2rem;
-            letter-spacing: 0.5rem;
-            text-transform: uppercase;
-            margin-bottom: 2rem;
-            font-weight: 300;
-            opacity: 0.8;
-        }
-
         #timer {
-            display: flex;
-            gap: 2rem;
+            font-size: 5rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(88, 166, 255, 0.3);
         }
+    </style>
+</head>
+<body>
 
-        .time-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    <div id="timer">Загрузка...</div>
 
-        /* Анимация появления цифр */
-        .digit {
+    <script>
+        const targetDate = new Date("Feb 25, 2026 21:00:00").getTime();
+
+        const updateTimer = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                clearInterval(updateTimer);
+                document.getElementById("timer").innerHTML = "ВРЕМЯ ПРИШЛО";
+                return;
+            }
+
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const format = (num) => num.toString().padStart(2, '0');
+
+            document.getElementById("timer").innerHTML = 
+                `${format(hours)}:${format(minutes)}:${format(seconds)}`;
+        }, 1000);
+    </script>
+</body>
+</html>
+     .digit {
             font-size: 6rem;
             font-weight: 700;
             line-height: 1;
