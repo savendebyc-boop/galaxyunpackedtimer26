@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Unpacked 2026 Countdown</title>
+    <style>
+        :root {
+            --samsung-blue: #1428A0;
+            --galaxy-dark: #000000;
+            --text-main: #ffffff;
+            --accent-blue: #0689D8;
+        }
+
+        body {
+            background-color: var(--galaxy-dark);
+            color: var(--text-main);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Задний фон с эффектом сияния */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--samsung-blue);
+            filter: blur(150px);
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        .title {
+            font-size: 1.2rem;
+            letter-spacing: 0.5rem;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        #timer {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .time-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Анимация появления цифр */
+        .digit {
+            font-size: 6rem;
+            font-weight: 700;
+            line-height: 1;
+            display: inline-block;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2rem;
+            margin-top: 0.5rem;
+            color: var(--accent-blue);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="title">Galaxy Unpacked</div>
+    
+    <div id="timer">
+        <div class="time-block">
+            <div id="hours" class="digit">00</div>
+            <div class="label">Hours</div>
+        </div>
+        <div class="time-block">
+            <div id="minutes" class="digit">00</div>
+            <div class="label">Mins</div>
+        </div>
+        <div class="time-block">
+            <div id="seconds" class="digit">00</div>
+            <div class="label">Secs</div>
+        </div>
+    </div>
+
+    <script>
+        // Дата события: 25 февраля 2026, 21:00:00
+        const targetDate = new Date("Feb 25, 2026 21:00:00").getTime();
+
+        function updateElement(id, value) {
+            const el = document.getElementById(id);
+            const strValue = value.toString().padStart(2, '0');
+            
+            if (el.innerText !== strValue) {
+                el.innerText = strValue;
+                // Перезапуск анимации
+                el.classList.remove('animate');
+                void el.offsetWidth; // Магия для сброса анимации
+                el.classList.add('animate');
+            }
+        }
+
+        const countdown = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                clearInterval(countdown);
+                document.body.innerHTML = "<h1 style='font-size:4rem; letter-spacing:1rem;'>THE FUTURE IS HERE</h1>";
+                return;
+            }
+
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            updateElement("hours", hours);
+            updateElement("minutes", minutes);
+            updateElement("seconds", seconds);
+        }, 1000);
+    </script>
+</body>
+</html>
