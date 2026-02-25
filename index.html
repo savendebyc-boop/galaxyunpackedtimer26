@@ -2,109 +2,141 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galaxy Unpacked 2026 Countdown</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Galaxy Unpacked Countdown</title>
+    <!-- Подключаем Telegram SDK -->
+    <script src="https://telegram.org"></script>
     <style>
         :root {
-            --samsung-blue: #1428A0;
-            --galaxy-dark: #000000;
-            --text-main: #ffffff;
-            --accent-blue: #0689D8;
+            /* Авто-подстройка под тему Telegram с Galaxy-фоллбэком */
+            --bg-color: var(--tg-theme-bg-color, #000000);
+            --text-color: var(--tg-theme-text-color, #ffffff);
+            --accent-color: var(--tg-theme-button-color, #0689D8);
+            --hint-color: var(--tg-theme-hint-color, #888888);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
         }
 
         body {
-            background-color: var(--galaxy-dark);
-            color: var(--text-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
-            height: 100vh;
+            padding: 0;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
             overflow: hidden;
+            transition: background-color 0.3s ease;
         }
 
-        /* Задний фон с эффектом сияния */
-        body::before {
-            content: '';
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: var(--samsung-blue);
-            filter: blur(150px);
-            opacity: 0.2;
-            z-index: -1;
+        .container {
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+            max-width: 800px;
         }
 
-        .title {
-            font-size: 1.2rem;
-            letter-spacing: 0.5rem;
+        .header-label {
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            letter-spacing: 0.4em;
             text-transform: uppercase;
-            margin-bottom: 2rem;
-            font-weight: 300;
-            opacity: 0.8;
+            margin-bottom: 2.5rem;
+            color: var(--hint-color);
+            font-weight: 500;
         }
 
         #timer {
-            display: flex;
-            gap: 2rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            align-items: center;
         }
 
         .time-block {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            gap: 5px;
         }
 
-        /* Анимация появления цифр */
         .digit {
-            font-size: 6rem;
-            font-weight: 700;
+            /* Масштабируется: большой на ПК, аккуратный на мобайле */
+            font-size: clamp(3.5rem, 18vw, 8rem);
+            font-weight: 800;
             line-height: 1;
+            font-variant-numeric: tabular-nums;
             display: inline-block;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .animate {
-            animation: slideUp 0.6s ease-out;
-        }
-
-        @keyframes slideUp {
-            0% { opacity: 0; transform: translateY(20px); filter: blur(5px); }
-            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
 
         .label {
-            font-size: 0.8rem;
+            font-size: clamp(0.7rem, 2.5vw, 0.9rem);
             text-transform: uppercase;
-            letter-spacing: 0.2rem;
-            margin-top: 0.5rem;
-            color: var(--accent-blue);
+            letter-spacing: 0.15em;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        /* Плавная анимация появления при смене цифр */
+        .animate {
+            animation: emerge 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes emerge {
+            0% { transform: translateY(15px); opacity: 0; filter: blur(5px); }
+            100% { transform: translateY(0); opacity: 1; filter: blur(0); }
+        }
+
+        /* Состояние "Событие началось" */
+        .event-live {
+            font-size: clamp(1.5rem, 8vw, 3rem);
+            letter-spacing: 0.2em;
+            font-weight: 800;
+            color: var(--accent-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <div class="title">Galaxy Unpacked</div>
-    
-    <div id="timer">
-        <div class="time-block">
-            <div id="hours" class="digit">00</div>
-            <div class="label">Hours</div>
-        </div>
-        <div class="time-block">
-            <div id="minutes" class="digit">00</div>
-            <div class="label">Mins</div>
-        </div>
-        <div class="time-block">
-            <div id="seconds" class="digit">00</div>
-            <div class="label">Secs</div>
+    <div class="container">
+        <div class="header-label">Galaxy Unpacked</div>
+        
+        <div id="timer">
+            <div class="time-block">
+                <div id="hours" class="digit">00</div>
+                <div class="label">Hours</div>
+            </div>
+            <div class="time-block">
+                <div id="minutes" class="digit">00</div>
+                <div class="label">Mins</div>
+            </div>
+            <div class="time-block">
+                <div id="seconds" class="digit">00</div>
+                <div class="label">Secs</div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Дата события: 25 февраля 2026, 21:00:00
+        const tg = window.Telegram.WebApp;
+        
+        // Настройка WebApp
+        tg.ready();
+        tg.expand();
+        tg.headerColor = 'secondary_bg_color';
+
+        // Целевая дата: 25 февраля 2026, 21:00:00
         const targetDate = new Date("Feb 25, 2026 21:00:00").getTime();
 
         function updateElement(id, value) {
@@ -113,9 +145,8 @@
             
             if (el.innerText !== strValue) {
                 el.innerText = strValue;
-                // Перезапуск анимации
                 el.classList.remove('animate');
-                void el.offsetWidth; // Магия для сброса анимации
+                void el.offsetWidth; // Force reflow для перезапуска анимации
                 el.classList.add('animate');
             }
         }
@@ -124,19 +155,27 @@
             const now = new Date().getTime();
             const distance = targetDate - now;
 
+            // Если время вышло
             if (distance < 0) {
                 clearInterval(countdown);
-                document.body.innerHTML = "<h1 style='font-size:4rem; letter-spacing:1rem;'>THE FUTURE IS HERE</h1>";
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                document.querySelector(".container").innerHTML = 
+                    "<div class='event-live'>EVENT IS LIVE</div>";
                 return;
             }
 
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((distance % (1000 * 60)) / 1000);
 
-            updateElement("hours", hours);
-            updateElement("minutes", minutes);
-            updateElement("seconds", seconds);
+            // Тактильный отклик каждую секунду за 5 секунд до старта
+            if (distance <= 5500 && distance > 500) {
+                if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            }
+
+            updateElement("hours", h);
+            updateElement("minutes", m);
+            updateElement("seconds", s);
         }, 1000);
     </script>
 </body>
